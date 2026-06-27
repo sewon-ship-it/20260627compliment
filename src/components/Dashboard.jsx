@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import CounselingHelper from './CounselingHelper';
 
 export default function Dashboard({ students, selectedMonth, onUpdateName, onUpdateGroup, onBulkUpdate, onClearData, onExportData }) {
   const [editingStudent, setEditingStudent] = useState(null);
@@ -213,6 +214,9 @@ export default function Dashboard({ students, selectedMonth, onUpdateName, onUpd
           </div>
         </div>
       </div>
+
+      {/* AI 상담 전략 도우미 패널 추가 */}
+      <CounselingHelper students={students} />
     </div>
   );
 }

@@ -5,10 +5,13 @@ import Setup from './components/Setup';
 import Dashboard from './components/Dashboard';
 import StickerBoard from './components/StickerBoard';
 import PoliciesModal from './components/PoliciesModal';
+import StudentReflection from './components/StudentReflection';
 
 
 function App() {
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [userRole, setUserRole] = useState(null); // 'teacher' | 'student'
+  const [loggedInStudentNumber, setLoggedInStudentNumber] = useState(null);
   const [activeTab, setActiveTab] = useState('board'); // 'board' or 'dashboard'
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [activePolicyTab, setActivePolicyTab] = useState(null);
@@ -24,7 +27,28 @@ function App() {
   } = useStickerData();
 
   if (!isAuthorized) {
-    return <Setup onComplete={() => setIsAuthorized(true)} />;
+    return (
+      <Setup 
+        onComplete={(role, studentNum) => {
+          setUserRole(role);
+          setLoggedInStudentNumber(studentNum);
+          setIsAuthorized(true);
+        }} 
+      />
+    );
+  }
+
+  if (userRole === 'student') {
+    return (
+      <div className="app-container">
+        <header className="header no-print">
+          <div className="header-title">우리 반 칭찬 스티커판 ✨ (학생 모드)</div>
+        </header>
+        <main className="main-content">
+          <StudentReflection studentNumber={loggedInStudentNumber} />
+        </main>
+      </div>
+    );
   }
 
   return (
