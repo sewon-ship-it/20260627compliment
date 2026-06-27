@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Dashboard({ students, onUpdateName, onClearData, onExportData }) {
+export default function Dashboard({ students, selectedMonth, onUpdateName, onUpdateGroup, onClearData, onExportData }) {
   const [editingStudent, setEditingStudent] = useState(null);
   const [tempName, setTempName] = useState('');
 
@@ -19,6 +19,10 @@ export default function Dashboard({ students, onUpdateName, onClearData, onExpor
   const handleSaveName = (id) => {
     onUpdateName(id, tempName);
     setEditingStudent(null);
+  };
+
+  const handleGroupChange = (studentId, newGroupNum) => {
+    onUpdateGroup(studentId, selectedMonth, newGroupNum);
   };
 
   const handleClear = () => {
@@ -69,7 +73,17 @@ export default function Dashboard({ students, onUpdateName, onClearData, onExpor
                         s.name
                       )}
                     </td>
-                    <td style={{ padding: '0.5rem' }}>{s.groupNumber}</td>
+                    <td style={{ padding: '0.5rem' }}>
+                      <select 
+                        value={s.monthlyGroups?.[selectedMonth] || 1} 
+                        onChange={(e) => handleGroupChange(s.id, e.target.value)}
+                        style={{ background: 'rgba(0,0,0,0.3)', color: 'white', border: '1px solid var(--border-color)', padding: '0.2rem', borderRadius: '4px' }}
+                      >
+                        {[1, 2, 3, 4, 5, 6].map(num => (
+                          <option key={num} value={num}>{num}모둠</option>
+                        ))}
+                      </select>
+                    </td>
                     <td style={{ padding: '0.5rem' }}>{s.totalStickers}</td>
                     <td style={{ padding: '0.5rem' }}>
                       {editingStudent === s.id ? (

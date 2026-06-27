@@ -55,11 +55,13 @@ function App() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [activeTab, setActiveTab] = useState('board'); // 'board' or 'dashboard'
   const [modalContent, setModalContent] = useState(null); // { title, content }
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
 
   const {
     students,
     addCompliment,
     updateStudentName,
+    updateStudentGroup,
     clearData,
     exportData
   } = useStickerData();
@@ -73,6 +75,17 @@ function App() {
       <header className="header no-print">
         <div className="header-title">우리 반 칭찬 스티커판 ✨</div>
         <nav className="header-nav">
+          <div style={{ display: 'flex', alignItems: 'center', marginRight: '1rem', gap: '0.5rem' }}>
+            <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>월 선택:</label>
+            <input 
+              type="range" 
+              min="1" max="12" 
+              value={selectedMonth} 
+              onChange={(e) => setSelectedMonth(parseInt(e.target.value, 10))}
+              style={{ width: '100px' }}
+            />
+            <span style={{ fontWeight: 'bold' }}>{selectedMonth}월</span>
+          </div>
           <button 
             className={`nav-btn ${activeTab === 'board' ? 'active' : ''}`}
             onClick={() => setActiveTab('board')}
@@ -92,12 +105,15 @@ function App() {
         {activeTab === 'board' ? (
           <StickerBoard 
             students={students} 
+            selectedMonth={selectedMonth}
             onAddCompliment={addCompliment} 
           />
         ) : (
           <Dashboard 
             students={students} 
+            selectedMonth={selectedMonth}
             onUpdateName={updateStudentName}
+            onUpdateGroup={updateStudentGroup}
             onClearData={clearData}
             onExportData={exportData}
           />

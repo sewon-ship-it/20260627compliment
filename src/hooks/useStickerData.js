@@ -7,11 +7,18 @@ const initializeStudents = () => {
   const students = [];
   for (let i = 1; i <= 24; i++) {
     const groupNum = Math.ceil(i / 4);
+    
+    // 1월부터 12월까지 기본 모둠 배정
+    const monthlyGroups = {};
+    for (let m = 1; m <= 12; m++) {
+      monthlyGroups[m] = groupNum;
+    }
+
     students.push({
       id: `student_${i}`,
       number: i,
       name: `학생 ${i}`, // Default name, can be masked or changed
-      groupNumber: groupNum,
+      monthlyGroups: monthlyGroups,
       totalStickers: 0,
       complimentHistory: []
     });
@@ -27,7 +34,18 @@ export const useStickerData = () => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       try {
-        setStudents(JSON.parse(saved));
+        let parsed = JSON.parse(saved);
+        // 마이그레이션: 기존 groupNumber가 있고 monthlyGroups가 없는 경우
+        parsed = parsed.map(s => {
+          if (s.groupNumber !== undefined && !s.monthlyGroups) {
+            const mGroups = {};
+            for (let m = 1; m <= 12; m++) mGroups[m] = s.groupNumber;
+            const { groupNumber, ...rest } = s;
+            return { ...rest, monthlyGroups: mGroups };
+          }
+          return s;
+        });
+        setStudents(parsed);
       } catch (e) {
         console.error("Failed to parse local data", e);
         setStudents(initializeStudents());
@@ -66,6 +84,21 @@ export const useStickerData = () => {
     ));
   };
 
+  const updateStudentGroup = (studentId, month, newGroupNum) => {
+    setStudents(prev => prev.map(student => {
+      if (student.id === studentId) {
+        return {
+          ...student,
+          monthlyGroups: {
+            ...student.monthlyGroups,
+            [month]: parseInt(newGroupNum, 10)
+          }
+        };
+      }
+      return student;
+    }));
+  };
+
   const clearData = () => {
     setStudents(initializeStudents());
   };
@@ -84,6 +117,7 @@ export const useStickerData = () => {
     students,
     addCompliment,
     updateStudentName,
+    updateStudentGroup,
     clearData,
     exportData
   };

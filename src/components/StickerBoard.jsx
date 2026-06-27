@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import GroupCard from './GroupCard';
 
-export default function StickerBoard({ students, onAddCompliment }) {
+export default function StickerBoard({ students, selectedMonth, onAddCompliment }) {
   const [selectedStudent, setSelectedStudent] = useState(null);
   const [reason, setReason] = useState('');
 
   // 그룹별로 학생 나누기
   const groups = Array.from({ length: 6 }, (_, i) => i + 1).map(groupNum => {
-    return students.filter(s => s.groupNumber === groupNum);
+    return students.filter(s => (s.monthlyGroups?.[selectedMonth] || 1) === groupNum);
   });
 
   const handleStudentClick = (student) => {
