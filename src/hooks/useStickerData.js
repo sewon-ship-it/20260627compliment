@@ -99,6 +99,26 @@ export const useStickerData = () => {
     }));
   };
 
+  const bulkUpdateStudents = (dataList, month) => {
+    setStudents(prev => {
+      const newStudents = [...prev];
+      dataList.forEach(data => {
+        const idx = newStudents.findIndex(s => s.number === data.number);
+        if (idx !== -1) {
+          newStudents[idx] = {
+            ...newStudents[idx],
+            name: data.name || newStudents[idx].name,
+            monthlyGroups: {
+              ...newStudents[idx].monthlyGroups,
+              [month]: data.group || newStudents[idx].monthlyGroups[month]
+            }
+          };
+        }
+      });
+      return newStudents;
+    });
+  };
+
   const clearData = () => {
     setStudents(initializeStudents());
   };
@@ -118,6 +138,7 @@ export const useStickerData = () => {
     addCompliment,
     updateStudentName,
     updateStudentGroup,
+    bulkUpdateStudents,
     clearData,
     exportData
   };

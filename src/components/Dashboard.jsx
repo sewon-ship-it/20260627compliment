@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 
-export default function Dashboard({ students, selectedMonth, onUpdateName, onUpdateGroup, onClearData, onExportData }) {
+export default function Dashboard({ students, selectedMonth, onUpdateName, onUpdateGroup, onBulkUpdate, onClearData, onExportData }) {
   const [editingStudent, setEditingStudent] = useState(null);
   const [tempName, setTempName] = useState('');
 
@@ -23,6 +23,40 @@ export default function Dashboard({ students, selectedMonth, onUpdateName, onUpd
 
   const handleGroupChange = (studentId, newGroupNum) => {
     onUpdateGroup(studentId, selectedMonth, newGroupNum);
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+  
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n').filter(line => line.trim().length > 0);
+      const parsedData = [];
+      lines.forEach((line, index) => {
+        const parts = line.split(',');
+        // 첫 줄이 헤더인지 확인 (첫 글자가 숫자가 아니면 헤더로 간주)
+        if (index === 0 && isNaN(parseInt(parts[0].trim(), 10))) return;
+        
+        if (parts.length >= 3) {
+          parsedData.push({
+            number: parseInt(parts[0].trim(), 10),
+            name: parts[1].trim(),
+            group: parseInt(parts[2].trim(), 10)
+          });
+        }
+      });
+      
+      if (parsedData.length > 0) {
+        onBulkUpdate(parsedData, selectedMonth);
+        alert(`${selectedMonth}월에 ${parsedData.length}명의 데이터가 반영되었습니다.`);
+      } else {
+        alert("올바른 형식의 CSV가 아닙니다. (번호, 이름, 모둠 순서)");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = null; // reset input
   };
 
   const handleClear = () => {
@@ -118,7 +152,22 @@ export default function Dashboard({ students, selectedMonth, onUpdateName, onUpd
           )}
           
           <div style={{ marginTop: '2rem', paddingTop: '1rem', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '1rem', flexDirection: 'column' }}>
-            <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>데이터 관리 (학기말/학년말)</h4>
+            <h4 style={{ color: 'var(--text-secondary)', marginBottom: '0.5rem' }}>데이터 일괄 추가 / 관리</h4>
+            
+            <label className="btn-primary" style={{ textAlign: 'center', cursor: 'pointer', background: 'var(--surface-hover)' }}>
+              📄 CSV(엑셀) 파일로 모둠 명단 업로드
+              <input 
+                type="file" 
+                accept=".csv" 
+                style={{ display: 'none' }} 
+                onChange={handleFileUpload} 
+              />
+            </label>
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+              * 현재 선택된 <strong>{selectedMonth}월</strong>의 모둠으로 배정됩니다.<br/>
+              * CSV 형식: <code>번호, 이름, 모둠</code> (예: <code>1, 홍길동, 3</code>)
+            </p>
+
             <button className="btn-primary" onClick={onExportData}>데이터 백업 (JSON 다운로드)</button>
             <button className="btn-danger" onClick={handleClear}>모든 데이터 초기화 (영구 삭제)</button>
           </div>

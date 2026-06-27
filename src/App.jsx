@@ -62,6 +62,7 @@ function App() {
     addCompliment,
     updateStudentName,
     updateStudentGroup,
+    bulkUpdateStudents,
     clearData,
     exportData
   } = useStickerData();
@@ -114,6 +115,7 @@ function App() {
             selectedMonth={selectedMonth}
             onUpdateName={updateStudentName}
             onUpdateGroup={updateStudentGroup}
+            onBulkUpdate={bulkUpdateStudents}
             onClearData={clearData}
             onExportData={exportData}
           />
