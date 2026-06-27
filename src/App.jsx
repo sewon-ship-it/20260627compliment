@@ -12,6 +12,7 @@ function App() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [userRole, setUserRole] = useState(null); // 'teacher' | 'student'
   const [loggedInStudentNumber, setLoggedInStudentNumber] = useState(null);
+  const [loggedInUid, setLoggedInUid] = useState(null);
   const [activeTab, setActiveTab] = useState('board'); // 'board' or 'dashboard'
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
   const [activePolicyTab, setActivePolicyTab] = useState(null);
@@ -24,14 +25,15 @@ function App() {
     bulkUpdateStudents,
     clearData,
     exportData
-  } = useStickerData();
+  } = useStickerData(loggedInUid);
 
   if (!isAuthorized) {
     return (
       <Setup 
-        onComplete={(role, studentNum) => {
+        onComplete={(role, studentNum, uid) => {
           setUserRole(role);
           setLoggedInStudentNumber(studentNum);
+          setLoggedInUid(uid);
           setIsAuthorized(true);
         }} 
       />

@@ -31,6 +31,7 @@ export default function Setup({ onComplete }) {
       const result = await window.firebaseSignIn(window.firebaseAuth, window.firebaseGoogleProvider);
       console.log("Logged in as:", result.user.email);
       setRole('teacher');
+      onComplete('teacher', null, result.user.uid);
     } catch (error) {
       console.error(error);
       alert("로그인 실패: " + error.message);
@@ -53,7 +54,10 @@ export default function Setup({ onComplete }) {
       alert("핵심 가이드 숙지 및 실천에 체크해 주세요.");
       return;
     }
-    onComplete(role, role === 'student' ? studentNumber : null);
+    // Note: Teacher already calls onComplete during login. This is for student or generic fallback.
+    if (role === 'student') {
+      onComplete(role, studentNumber, null);
+    }
   };
 
   if (!role) {
@@ -157,23 +161,25 @@ export default function Setup({ onComplete }) {
 
         </div>
 
-        <form onSubmit={handleAgreementSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-          <label className="checkbox-label" style={{ justifyContent: 'center', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px' }}>
-            <input 
-              type="checkbox" 
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
-              style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
-            />
-            <span className="checkbox-text" style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white' }}>
-              나는 윤리 핵심가이드를 빠짐없이 읽고 이를 실천하겠습니다.
-            </span>
-          </label>
-          
-          <button type="submit" className="btn-primary" style={{ padding: '1rem', fontSize: '1.1rem' }}>
-            서약 및 본 활동 입장하기
-          </button>
-        </form>
+        {role === 'student' && (
+          <form onSubmit={handleAgreementSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            <label className="checkbox-label" style={{ justifyContent: 'center', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px' }}>
+              <input 
+                type="checkbox" 
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                style={{ width: '1.2rem', height: '1.2rem', cursor: 'pointer' }}
+              />
+              <span className="checkbox-text" style={{ fontSize: '1rem', fontWeight: 'bold', color: 'white' }}>
+                나는 윤리 핵심가이드를 빠짐없이 읽고 이를 실천하겠습니다.
+              </span>
+            </label>
+            
+            <button type="submit" className="btn-primary" style={{ padding: '1rem', fontSize: '1.1rem' }}>
+              서약 및 본 활동 입장하기
+            </button>
+          </form>
+        )}
       </div>
     </div>
   );
