@@ -63,9 +63,22 @@ export default function Setup({ onComplete }) {
   if (!role) {
     return (
       <div className="setup-container">
-        <div className="glass-panel setup-card" style={{ maxWidth: '400px', width: '100%', textAlign: 'center' }}>
-          <h2 style={{ marginBottom: '2rem' }}>로그인</h2>
+        <div className="glass-panel setup-card" style={{ maxWidth: '450px', width: '100%', textAlign: 'center' }}>
+          <h2 style={{ marginBottom: '1rem' }}>로그인</h2>
           
+          <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1.5rem', borderRadius: '12px', marginBottom: '2rem', textAlign: 'left', fontSize: '0.9rem', lineHeight: '1.6' }}>
+            <h3 style={{ color: 'var(--accent-color)', marginBottom: '0.8rem', fontSize: '1rem' }}>📌 앱 주요 기능 안내</h3>
+            <ul style={{ margin: 0, paddingLeft: '1.5rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '0.3rem' }}>
+              <li>교사별 구글 로그인 가능 (Firebase Auth)</li>
+              <li>교사별 데이터 별도 저장 (Firebase DB)</li>
+              <li>학생 로그인 시 AI 학교생활 상담 (Gemini API)</li>
+              <li>대시보드/관리 탭에서 월별 자리 업로드</li>
+              <li>학생별 칭찬 스티커 및 칭찬 사유 기록</li>
+              <li>월별/모둠별 칭찬스티커판 결과 인쇄 및 PDF 저장</li>
+              <li>월별 모둠 칭찬스티커판 슬라이더 표시</li>
+            </ul>
+          </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
             {/* 교사 로그인 영역 */}
             <div style={{ padding: '1.5rem', background: 'rgba(255,255,255,0.05)', borderRadius: '12px' }}>
