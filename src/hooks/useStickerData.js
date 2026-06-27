@@ -99,7 +99,7 @@ export const useStickerData = () => {
     }));
   };
 
-  const bulkUpdateStudents = (dataList, month) => {
+  const bulkUpdateStudents = (dataList) => {
     setStudents(prev => {
       const newStudents = [...prev];
       dataList.forEach(data => {
@@ -110,7 +110,7 @@ export const useStickerData = () => {
             name: data.name || newStudents[idx].name,
             monthlyGroups: {
               ...newStudents[idx].monthlyGroups,
-              [month]: data.group || newStudents[idx].monthlyGroups[month]
+              ...(data.monthlyGroups || {})
             }
           };
         }

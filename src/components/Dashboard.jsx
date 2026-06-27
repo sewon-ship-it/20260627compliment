@@ -34,25 +34,65 @@ export default function Dashboard({ students, selectedMonth, onUpdateName, onUpd
       const text = event.target.result;
       const lines = text.split('\n').filter(line => line.trim().length > 0);
       const parsedData = [];
+      let monthHeaders = [];
+
       lines.forEach((line, index) => {
-        const parts = line.split(',');
-        // 첫 줄이 헤더인지 확인 (첫 글자가 숫자가 아니면 헤더로 간주)
-        if (index === 0 && isNaN(parseInt(parts[0].trim(), 10))) return;
+        const parts = line.split(',').map(p => p.trim());
         
-        if (parts.length >= 3) {
-          parsedData.push({
-            number: parseInt(parts[0].trim(), 10),
-            name: parts[1].trim(),
-            group: parseInt(parts[2].trim(), 10)
+        // 첫 줄이 헤더인지 확인 (첫 글자가 숫자가 아니면 헤더로 간주)
+        if (index === 0 && isNaN(parseInt(parts[0], 10))) {
+          // 헤더에서 '월' 이 포함된 컬럼의 인덱스와 월 숫자를 추출
+          parts.forEach((p, i) => {
+            const match = p.match(/(\d+)월/);
+            if (match) {
+              monthHeaders.push({ index: i, month: parseInt(match[1], 10) });
+            }
           });
+          return;
+        }
+        
+        if (parts.length >= 2) {
+          const number = parseInt(parts[0], 10);
+          if (isNaN(number)) return;
+
+          const studentData = {
+            number: number,
+            name: parts[1],
+            monthlyGroups: {}
+          };
+          
+          // 헤더에 'N월'이 명시되어 있는 경우
+          if (monthHeaders.length > 0) {
+            monthHeaders.forEach(mh => {
+              if (parts[mh.index]) {
+                const groupNum = parseInt(parts[mh.index], 10);
+                if (!isNaN(groupNum)) {
+                  studentData.monthlyGroups[mh.month] = groupNum;
+                }
+              }
+            });
+          } 
+          // 헤더가 없거나 'N월'이 명시되지 않은 경우, 기존처럼 3번째 컬럼을 선택된 월(selectedMonth)로 배정
+          else if (parts.length >= 3) {
+            const groupNum = parseInt(parts[2], 10);
+            if (!isNaN(groupNum)) {
+               studentData.monthlyGroups[selectedMonth] = groupNum;
+            }
+          }
+
+          parsedData.push(studentData);
         }
       });
       
       if (parsedData.length > 0) {
-        onBulkUpdate(parsedData, selectedMonth);
-        alert(`${selectedMonth}월에 ${parsedData.length}명의 데이터가 반영되었습니다.`);
+        onBulkUpdate(parsedData);
+        if (monthHeaders.length > 0) {
+           alert(`여러 월(${monthHeaders.map(m=>m.month).join(', ')}월)의 모둠 배치 데이터가 일괄 반영되었습니다.`);
+        } else {
+           alert(`${selectedMonth}월에 ${parsedData.length}명의 데이터가 반영되었습니다.`);
+        }
       } else {
-        alert("올바른 형식의 CSV가 아닙니다. (번호, 이름, 모둠 순서)");
+        alert("올바른 형식의 CSV가 아닙니다. (번호, 이름, 3월, 4월...)");
       }
     };
     reader.readAsText(file);
@@ -164,8 +204,8 @@ export default function Dashboard({ students, selectedMonth, onUpdateName, onUpd
               />
             </label>
             <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-              * 현재 선택된 <strong>{selectedMonth}월</strong>의 모둠으로 배정됩니다.<br/>
-              * CSV 형식: <code>번호, 이름, 모둠</code> (예: <code>1, 홍길동, 3</code>)
+              * <strong>방식 1 (간단):</strong> <code>번호, 이름, 모둠</code> (현재 선택된 <strong>{selectedMonth}월</strong>로 배정됨)<br/>
+              * <strong>방식 2 (월별 전체 업로드):</strong> 첫 줄 헤더에 <code>번호, 이름, 3월, 4월, 5월...</code>을 적고 각 월별 모둠 번호를 입력하시면 한 번에 1년 치 자리를 세팅할 수 있습니다!
             </p>
 
             <button className="btn-primary" onClick={onExportData}>데이터 백업 (JSON 다운로드)</button>
