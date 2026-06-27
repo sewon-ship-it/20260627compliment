@@ -5,11 +5,36 @@ export default function Setup({ onComplete }) {
   const [studentNumber, setStudentNumber] = useState('');
   const [agreed, setAgreed] = useState(false);
 
-  const handleTeacherLogin = () => {
-    // 실제 Firebase Auth 연동 시 이곳에 구현
-    // prompt에 따라 "google 로그인하는 페이지랑(firebase auth)"를 구현해야 하나, 
-    // 외부 패키지 금지 제약이 있으므로 UI만 Google 로그인 형태로 모의(Mock) 처리합니다.
-    setRole('teacher');
+  const handleTeacherLogin = async () => {
+    try {
+      // Vite 환경 변수에서 Firebase 설정 불러오기
+      const config = {
+        apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+        authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+        projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+      };
+      
+      if (!config.apiKey) {
+        alert("Firebase 설정이 누락되었습니다. .env 파일에 VITE_FIREBASE_API_KEY 등을 입력해주세요.");
+        return;
+      }
+      
+      if (!window.firebaseInit) {
+        alert("Firebase 스크립트가 아직 로드되지 않았습니다. 잠시 후 다시 시도해주세요.");
+        return;
+      }
+      
+      if (!window.firebaseAuth) {
+         window.firebaseInit(config);
+      }
+      
+      const result = await window.firebaseSignIn(window.firebaseAuth, window.firebaseGoogleProvider);
+      console.log("Logged in as:", result.user.email);
+      setRole('teacher');
+    } catch (error) {
+      console.error(error);
+      alert("로그인 실패: " + error.message);
+    }
   };
 
   const handleStudentLogin = (e) => {

@@ -8,6 +8,17 @@
   </head>
   <body>
     <div id="root"></div>
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+      import { getAuth, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+      
+      window.firebaseInit = function(config) {
+        const app = initializeApp(config);
+        window.firebaseAuth = getAuth(app);
+        window.firebaseGoogleProvider = new GoogleAuthProvider();
+        window.firebaseSignIn = signInWithPopup;
+      };
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
