@@ -11,7 +11,7 @@ function App() {
   const [isAuthorized, setIsAuthorized] = useState(false);
   const [activeTab, setActiveTab] = useState('board'); // 'board' or 'dashboard'
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
-  const [showPolicies, setShowPolicies] = useState(false);
+  const [activePolicyTab, setActivePolicyTab] = useState(null);
 
   const {
     students,
@@ -80,13 +80,19 @@ function App() {
 
 
       {/* Footer */}
-      <footer style={{ textAlign: 'center', padding: '1rem', marginTop: 'auto', borderTop: '1px solid var(--border-color)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
-        <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => setShowPolicies(true)}>개인정보 처리방침 및 이용약관</span>
-        <span style={{ margin: '0 0.5rem' }}>|</span>
-        <span>© 2026 우리 반 칭찬 스티커판</span>
+      <footer style={{ padding: '1.5rem', marginTop: 'auto', borderTop: '1px solid var(--border-color)', fontSize: '0.85rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+        <div>
+          <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => setActivePolicyTab('terms')}>이용약관</span>
+          <span style={{ margin: '0 0.8rem' }}>|</span>
+          <span style={{ cursor: 'pointer', textDecoration: 'underline' }} onClick={() => setActivePolicyTab('privacy')}>개인정보 처리방침</span>
+        </div>
+        <div style={{ textAlign: 'center', lineHeight: '1.5' }}>
+          <span>정보관리책임자: 중앙대학교사범대학부속초등학교 교사 박세원</span><br/>
+          <span>© 2026 우리 반 칭찬 스티커판. All rights reserved.</span>
+        </div>
       </footer>
 
-      {showPolicies && <PoliciesModal onClose={() => setShowPolicies(false)} />}
+      {activePolicyTab && <PoliciesModal initialTab={activePolicyTab} onClose={() => setActivePolicyTab(null)} />}
     </div>
   );
 }
